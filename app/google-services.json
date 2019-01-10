@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1015591590846",
+    "firebase_url": "https://videoapplication-d346a.firebaseio.com",
+    "project_id": "videoapplication-d346a",
+    "storage_bucket": "videoapplication-d346a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1015591590846:android:6f582babd837d4fc",
+        "android_client_info": {
+          "package_name": "com.mobiotics.videoapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1015591590846-4ar9nhc8k3p2j2tb3s536mss3uus2br6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMcwd7kPd69IZTXtWhE9RyW6TSgx0XVcw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
