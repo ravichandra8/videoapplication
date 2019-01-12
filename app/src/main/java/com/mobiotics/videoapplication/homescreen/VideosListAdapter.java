@@ -6,38 +6,37 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.mobiotics.videoapplication.modal.pojo.Response;
+import com.mobiotics.videoapplication.modal.pojo.Video;
 import  com.mobiotics.videoapplication.R;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 
-public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.MyViewHolder> {
+public class VideosListAdapter extends RecyclerView.Adapter<VideosListAdapter.MyViewHolder> {
 
-    private List<Response> imageList;
-    private MainContract.ImageClickListener listener;
+    private List<Video> videoList;
+    private MainContract.ItemClickListener listener;
 
-    public ImageListAdapter(List<Response> imageList, MainContract.ImageClickListener listener) {
-        this.imageList = imageList;
+    public VideosListAdapter(List<Video> videoList, MainContract.ItemClickListener listener) {
+        this.videoList = videoList;
         this.listener = listener;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.image_layout, parent, false);
+                .inflate(R.layout.video_layout, parent, false);
 
         return new MyViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder,  int position) {
-        final int pos=position;
-        final Response image = imageList.get(position);
-        holder.title.setText(image.getTitle().toString());
-        holder.description.setText(image.getDescription().toString());
+    public void onBindViewHolder(MyViewHolder holder,int position) {
+        final Video video = videoList.get(position);
+        holder.title.setText(video.getTitle().toString());
+        holder.description.setText(video.getDescription().toString());
 
         Picasso.get()
-                .load(image.getThumb())
+                .load(video.getThumb())
                 .placeholder(R.drawable.shimmer_background)
                 .into(holder.image);
 
@@ -45,19 +44,19 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.MyVi
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onImageClick(image.getId());
+                listener.onItemClick(video.getId());
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return imageList.size();
+        return videoList.size();
     }
 
     @Override
     public long getItemId(int position) {
-        return Integer.parseInt(imageList.get(position).getId());
+        return Integer.parseInt(videoList.get(position).getId());
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

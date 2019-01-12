@@ -2,31 +2,31 @@ package com.mobiotics.videoapplication.homescreen;
 
 import com.mobiotics.videoapplication.Util.ErrorCode;
 import com.mobiotics.videoapplication.Util.NetworkStatus;
-import com.mobiotics.videoapplication.modal.ImageDataSource.LoadCallBackListener;
-import com.mobiotics.videoapplication.modal.ImageRepository;
-import com.mobiotics.videoapplication.modal.pojo.Response;
+import com.mobiotics.videoapplication.modal.VideoDataSource.LoadCallBackListener;
+import com.mobiotics.videoapplication.modal.VideoRepository;
+import com.mobiotics.videoapplication.modal.pojo.Video;
 import  com.mobiotics.videoapplication.R;
 import java.util.List;
 
 public class MainPresenter implements MainContract.Presenter {
 
     private MainContract.View view;
-    private ImageRepository repository;
+    private VideoRepository repository;
 
-    public MainPresenter(MainContract.View view, ImageRepository repository) {
+    public MainPresenter(MainContract.View view, VideoRepository repository) {
         this.view = view;
         this.repository = repository;
         this.view.setPresenter(this);
     }
 
     @Override
-    public void getImages(NetworkStatus networkStatus) {
+    public void getListOfVideos(NetworkStatus networkStatus) {
         view.showLoadingIndicator(true);
         repository.getVideosContent(networkStatus, new LoadCallBackListener() {
             @Override
             public void onLoaded(Object response) {
                 view.showLoadingIndicator(false);
-                view.showImages((List<Response>) response);
+                view.showListOfVideos((List<Video>) response);
             }
 
             @Override
@@ -63,8 +63,8 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void showFullImage(String position) {
-        view.startFullImageActivity(position);
+    public void navigateToDetailsPage(String position) {
+        view.navigateToDetailsPage(position);
     }
 
     @Override

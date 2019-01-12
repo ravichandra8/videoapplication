@@ -3,7 +3,7 @@ package com.mobiotics.videoapplication.modal.pojo;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Response {
+public class Video {
     @SerializedName("description")
     @Expose
     private String description;
@@ -19,6 +19,8 @@ public class Response {
     @SerializedName("url")
     @Expose
     private String url;
+
+    private long videoDuration;
 
     public String getDescription() {
         return description;
@@ -60,4 +62,11 @@ public class Response {
         this.url = url;
     }
 
+    public long getVideoDuration() {
+        return videoDuration;
+    }
+
+    public void setVideoDuration(long videoDuration) {
+        this.videoDuration = videoDuration;
+    }
 }

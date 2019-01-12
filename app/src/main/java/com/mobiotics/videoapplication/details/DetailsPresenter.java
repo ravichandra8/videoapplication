@@ -1,18 +1,18 @@
 package com.mobiotics.videoapplication.details;
 
 import com.mobiotics.videoapplication.Util.ErrorCode;
-import com.mobiotics.videoapplication.modal.ImageDataSource.LoadCallBackListener;
-import com.mobiotics.videoapplication.modal.ImageRepository;
-import com.mobiotics.videoapplication.modal.pojo.Response;
+import com.mobiotics.videoapplication.modal.VideoDataSource.LoadCallBackListener;
+import com.mobiotics.videoapplication.modal.VideoRepository;
+import com.mobiotics.videoapplication.modal.pojo.Video;
 import com.mobiotics.videoapplication.R;
 import java.util.List;
 
 public class DetailsPresenter implements DetailsContract.Presenter {
 
     private DetailsContract.View view;
-    private ImageRepository repository;
+    private VideoRepository repository;
 
-    public DetailsPresenter(DetailsContract.View view, ImageRepository repository) {
+    public DetailsPresenter(DetailsContract.View view, VideoRepository repository) {
         this.view = view;
         this.repository = repository;
         this.view.setPresenter(this);
@@ -41,33 +41,44 @@ public class DetailsPresenter implements DetailsContract.Presenter {
     }
 
     @Override
-    public void getParticularContent(String id) {
-        repository.getParticularVideo(id, new LoadCallBackListener() {
+    public void getParticularContent(String id,boolean isNext) {
+        repository.getParticularVideo(id, isNext,new LoadCallBackListener() {
             @Override
             public void onLoaded(Object response) {
-                view.getParticularVideo((Response) response);
+                view.getParticularVideo((Video) response);
             }
 
             @Override
             public void onError(Object error) {
             //ToDO: need to handle error message
+                view.showError(filterError(error));
             }
         });
     }
 
     @Override
-    public void getRemainingContent(String id) {
-        repository.getRemainingContent(id, new LoadCallBackListener() {
+    public void getRelatedVideos(String id) {
+        repository.getRelatedVideos(id, new LoadCallBackListener() {
             @Override
             public void onLoaded(Object response) {
-                view.getRemainingContent((List<Response>) response);
+                view.getRelatedVideos((List<Video>) response);
             }
 
             @Override
             public void onError(Object error) {
-
+                view.showError(filterError(error));
             }
         });
+    }
+
+    @Override
+    public void storevideoPosition(String id, long timestamp,boolean videoState) {
+        repository.insertVideoPosition(id,timestamp,videoState);
+    }
+
+    @Override
+    public void deleteVideoPosition(String id) {
+     repository.deleteVideoPosition(id);
     }
 
 

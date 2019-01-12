@@ -3,11 +3,13 @@ package com.mobiotics.videoapplication.details;
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -22,9 +24,10 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.mobiotics.videoapplication.details.DetailsContract.Presenter;
-import com.mobiotics.videoapplication.modal.ImageRemoteDataSource;
-import com.mobiotics.videoapplication.modal.ImageRepository;
-import com.mobiotics.videoapplication.modal.pojo.Response;
+import com.mobiotics.videoapplication.modal.VideoRemoteDataSource;
+import com.mobiotics.videoapplication.modal.VideoRepository;
+import com.mobiotics.videoapplication.modal.MydatabaseAdapter;
+import com.mobiotics.videoapplication.modal.pojo.Video;
 import com.mobiotics.videoapplication.R;
 import java.util.List;
 
@@ -32,77 +35,81 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
 
     DetailsPresenter presenter;
     TextView title,description;
-    RecyclerView imageRecyclerView;
-    private ImageListAdapter imageListAdapter;
+    RecyclerView recyclerView;
+    private RelatedVideosAdapter relatedVideosAdapter;
 
     PlayerView playerView;
     SimpleExoPlayer player;
-    private String selectedPosition;
-
+    private String selectedVideoID;
+    LinearLayout rootView;
     private int currentWindow;
     private boolean playWhenReady = false;
     private long playbackPosition;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_full_image);
+        setContentView(R.layout.details_activity);
 
-
-         selectedPosition= getIntent().getStringExtra("position");
-        presenter = new DetailsPresenter(this, ImageRepository.getInstance(ImageRemoteDataSource.getInstance()));
+        selectedVideoID = getIntent().getStringExtra("position");
+        presenter = new DetailsPresenter(this, VideoRepository.getInstance(VideoRemoteDataSource.getInstance(),new MydatabaseAdapter(this)));
         presenter.start();
-
-
-
-
-
-
-    }
-
-    @Override
-    public void showLoadingIndicator(boolean active) {
 
     }
 
     @Override
     public void showError(String errorMsg) {
-
+        Snackbar.make(rootView, errorMsg, Snackbar.LENGTH_LONG)
+                .setActionTextColor(getResources().getColor(android.R.color.holo_red_light))
+                .show();
     }
 
     @Override
     public String getErrorString(int resourceId) {
-        return null;
+        return getResources().getString(resourceId);
     }
 
     @Override
     public void setUpUI() {
-        title=(TextView)findViewById(R.id.title);
-        description=(TextView)findViewById(R.id.description);
-        imageRecyclerView = findViewById(R.id.image_list);
+        title=findViewById(R.id.title);
+        description=findViewById(R.id.description);
+        rootView = findViewById(R.id.root_view);
+        recyclerView = findViewById(R.id.video_list);
         playerView = findViewById(R.id.video_view);
     }
 
     @Override
-    public void getParticularVideo(Response response) {
-        Log.d("ravi",response.getId());
+    public void getParticularVideo(Video video) {
+        Log.d("ravi", video.getId());
+        selectedVideoID = video.getId();
 
-        title.setText(response.getTitle());
-        description.setText(response.getDescription());
-        if(!response.getUrl().isEmpty()) {
-            MediaSource mediaSource = buildMediaSource(Uri.parse(response.getUrl()));
+        title.setText(video.getTitle());
+        description.setText(video.getDescription());
+        if(!video.getUrl().isEmpty()&&player!=null) {
+            MediaSource mediaSource = buildMediaSource(Uri.parse(video.getUrl()));
+            player.seekTo(currentWindow, video.getVideoDuration());
 
-            player.prepare(mediaSource, true, false);
+            player.setPlayWhenReady(playWhenReady);
+
+            playerView.setPlayer(player);
+            if(video.getVideoDuration()>0) {
+                player.prepare(mediaSource, false, false);
+            }
+            else{
+                player.prepare(mediaSource, true, false);
+            }
+
+
         }
 
     }
 
     @Override
-    public void getRemainingContent(List<Response> responses) {
+    public void getRelatedVideos(List<Video> videoList) {
         LinearLayoutManager manager = new LinearLayoutManager(this);
-        imageRecyclerView.setLayoutManager(manager);
-        imageListAdapter = new ImageListAdapter(responses);
-        imageRecyclerView.setAdapter(imageListAdapter);
-        imageListAdapter.notifyDataSetChanged();
+        recyclerView.setLayoutManager(manager);
+        relatedVideosAdapter = new RelatedVideosAdapter(videoList);
+        recyclerView.setAdapter(relatedVideosAdapter);
+        relatedVideosAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -117,9 +124,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
         super.onStart();
         if (Util.SDK_INT > 23) {
             initializePlayer();
-
-            presenter.getParticularContent(selectedPosition);
-            presenter.getRemainingContent(selectedPosition);
+            presenter.getParticularContent(selectedVideoID,false);
+            presenter.getRelatedVideos(selectedVideoID);
         }
     }
 
@@ -129,9 +135,8 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
         hideSystemUi();
         if ((Util.SDK_INT <= 23 || player == null)) {
             initializePlayer();
-
-            presenter.getParticularContent(selectedPosition);
-            presenter.getRemainingContent(selectedPosition);
+            presenter.getParticularContent(selectedVideoID,false);
+            presenter.getRelatedVideos(selectedVideoID);
         }
     }
 
@@ -156,11 +161,7 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
             player = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(this),
                 new DefaultTrackSelector(), new DefaultLoadControl());
 
-            player.seekTo(currentWindow, playbackPosition);
 
-            player.setPlayWhenReady(playWhenReady);
-
-            playerView.setPlayer(player);
 
             player.addListener(new DefaultEventListener() {
                 @Override
@@ -169,10 +170,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
 
                     if (playWhenReady && playbackState == Player.STATE_ENDED) {
                         Log.d("success", "ended");
-
-                      presenter.getParticularContent(selectedPosition+1);
-                      presenter.getRemainingContent(selectedPosition+1);
-
+                        presenter.deleteVideoPosition(selectedVideoID);
+                      presenter.getParticularContent(selectedVideoID,true);
+                        presenter.getRelatedVideos(selectedVideoID);
                     }
                 }
             });
@@ -190,7 +190,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
             currentWindow = player.getCurrentWindowIndex();
             playWhenReady = player.getPlayWhenReady();
             player.release();
-            Log.d("position", player.getCurrentPosition() + "");
+            if(playbackPosition>0) {
+                presenter.storevideoPosition(selectedVideoID, playbackPosition, playWhenReady);
+            }
             player = null;
         }
     }

@@ -3,7 +3,7 @@ package com.mobiotics.videoapplication.homescreen;
 import com.mobiotics.videoapplication.BasePresenter;
 import com.mobiotics.videoapplication.BaseView;
 import com.mobiotics.videoapplication.Util.NetworkStatus;
-import com.mobiotics.videoapplication.modal.pojo.Response;
+import com.mobiotics.videoapplication.modal.pojo.Video;
 import java.util.List;
 
 public interface MainContract {
@@ -23,10 +23,10 @@ public interface MainContract {
         void showError(String errorMsg);
 
         /**
-         * display image
-         * @param imageList image data
+         * get all the videos
+         * @param videoList
          */
-        void showImages(List<Response> imageList);
+        void showListOfVideos(List<Video> videoList);
 
         /**
          * gets the error string
@@ -36,10 +36,9 @@ public interface MainContract {
         String getErrorString(int resourceId);
 
         /**
-         * start full image activity
-         * @param position image url
+         * @param position
          */
-        void startFullImageActivity(String position);
+        void navigateToDetailsPage(String position);
 
         /**
          * show/hide network error layout
@@ -57,10 +56,10 @@ public interface MainContract {
     interface Presenter extends BasePresenter {
 
         /**
-         * gets the image list
+         * get all videos
          * @param networkStatus network interface
          */
-        void getImages(NetworkStatus networkStatus);
+        void getListOfVideos(NetworkStatus networkStatus);
 
         /**
          * gets filtered error
@@ -70,15 +69,15 @@ public interface MainContract {
         String filterError(Object errorCode);
 
         /**
-         * show full Image
-         * @param position image url
+         * navigate to detail page
+         * @param position
          */
-        void showFullImage(String position);
+        void navigateToDetailsPage(String position);
 
     }
 
-    interface ImageClickListener {
+    interface ItemClickListener {
 
-        void onImageClick(String position);
+        void onItemClick(String position);
     }
 }

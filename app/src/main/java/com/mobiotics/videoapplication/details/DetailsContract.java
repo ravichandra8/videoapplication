@@ -2,7 +2,7 @@ package com.mobiotics.videoapplication.details;
 
 import com.mobiotics.videoapplication.BasePresenter;
 import com.mobiotics.videoapplication.BaseView;
-import com.mobiotics.videoapplication.modal.pojo.Response;
+import com.mobiotics.videoapplication.modal.pojo.Video;
 import java.util.List;
 
 public interface DetailsContract {
@@ -10,17 +10,10 @@ public interface DetailsContract {
     interface View extends BaseView<Presenter> {
 
         /**
-         * show/hide loading indicatore
-         * @param active status
-         */
-        void showLoadingIndicator(boolean active);
-
-        /**
          * show error on snackbar
          * @param errorMsg msg to display
          */
         void showError(String errorMsg);
-
 
         /**
          * gets the error string
@@ -34,9 +27,18 @@ public interface DetailsContract {
          */
         void setUpUI();
 
-        void getParticularVideo(Response response);
+        /**
+         * get the particluar video
+         * @param video
+         */
 
-        void getRemainingContent(List<Response> responses);
+        void getParticularVideo(Video video);
+
+        /**
+         * get the related videos
+         * @param videoList
+         */
+        void getRelatedVideos(List<Video> videoList);
 
     }
 
@@ -50,17 +52,30 @@ public interface DetailsContract {
         String filterError(Object errorCode);
 
         /**
-         * show full Image
-         * @param id image url
+         * get paricular video based on id
+         * @param id
+         * @param isNext
          */
-        void getParticularContent(String id);
+        void getParticularContent(String id,boolean isNext);
 
-        void getRemainingContent(String id);
+        /**
+         * get the
+         * @param id
+         */
+        void getRelatedVideos(String id);
 
-    }
+        /**
+         * storing the details.
+         * @param id
+         * @param timestamp
+         * @param videoState
+         */
+        void storevideoPosition(String id,long timestamp,boolean videoState);
 
-    interface ImageClickListener {
-
-        void onImageClick(String position);
+        /**
+         * when video compeleted delete video details from sqlite.
+         * @param id
+         */
+       void deleteVideoPosition(String id);
     }
 }

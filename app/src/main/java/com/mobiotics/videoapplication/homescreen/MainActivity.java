@@ -12,18 +12,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.mobiotics.videoapplication.R;
 import com.mobiotics.videoapplication.Util.AppNetworkStatus;
 import com.mobiotics.videoapplication.details.DetailsActivity;
-import com.mobiotics.videoapplication.modal.ImageRemoteDataSource;
-import com.mobiotics.videoapplication.modal.ImageRepository;
-import com.mobiotics.videoapplication.modal.pojo.Response;
+import com.mobiotics.videoapplication.modal.VideoRemoteDataSource;
+import com.mobiotics.videoapplication.modal.VideoRepository;
+import com.mobiotics.videoapplication.modal.MydatabaseAdapter;
+import com.mobiotics.videoapplication.modal.pojo.Video;
 import java.util.List;
-import com.mobiotics.videoapplication.R;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View, MainContract.ImageClickListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements MainContract.View, MainContract.ItemClickListener, View.OnClickListener {
 
-    private RecyclerView imageRecyclerView;
-    private ImageListAdapter imageListAdapter;
+    private RecyclerView recyclerView;
+    private VideosListAdapter videosListAdapter;
     private FrameLayout errorView;
     private Button retryButton;
     private MainPresenter presenter;
@@ -34,9 +35,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        presenter = new MainPresenter(this, ImageRepository.getInstance(ImageRemoteDataSource.getInstance()));
+        presenter = new MainPresenter(this, VideoRepository.getInstance(VideoRemoteDataSource.getInstance(),new MydatabaseAdapter(this)));
         presenter.start();
-        presenter.getImages(new AppNetworkStatus(this));
+        presenter.getListOfVideos(new AppNetworkStatus(this));
     }
 
 
@@ -66,19 +67,19 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void showImages(List<Response> imageLists) {
-        if (imageListAdapter == null) {
+    public void showListOfVideos(List<Video> videoList) {
+        if (videosListAdapter == null) {
 
             LinearLayoutManager manager = new LinearLayoutManager(this);
-            imageRecyclerView.setLayoutManager(manager);
-            imageListAdapter = new ImageListAdapter(imageLists, this);
-            imageListAdapter.setHasStableIds(true);
-            imageRecyclerView.setAdapter(imageListAdapter);
+            recyclerView.setLayoutManager(manager);
+            videosListAdapter = new VideosListAdapter(videoList, this);
+            videosListAdapter.setHasStableIds(true);
+            recyclerView.setAdapter(videosListAdapter);
         } else {
-            imageListAdapter.notifyDataSetChanged();
+            videosListAdapter.notifyDataSetChanged();
 
         }
-        imageRecyclerView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void startFullImageActivity(String position) {
+    public void navigateToDetailsPage(String position) {
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("position", position);
         startActivity(intent);
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         toolbar.setTitle(getResources().getString(R.string.app_name));
         setSupportActionBar(toolbar);
         rootView = findViewById(R.id.root_view);
-        imageRecyclerView = findViewById(R.id.image_list);
+        recyclerView = findViewById(R.id.video_list);
         shimmerViewContainer = findViewById(R.id.shimmer_view_container);
         errorView = findViewById(R.id.retry_layout);
         retryButton = errorView.findViewById(R.id.button_retry);
@@ -129,16 +130,16 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void onImageClick(String position) {
+    public void onItemClick(String position) {
 
-        presenter.showFullImage(position);
+        presenter.navigateToDetailsPage(position);
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_retry) {
             showNetworkError(false);
-            presenter.getImages(new AppNetworkStatus(this));
+            presenter.getListOfVideos(new AppNetworkStatus(this));
         }
     }
 }
