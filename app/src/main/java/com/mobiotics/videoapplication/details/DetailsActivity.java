@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -70,6 +71,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
 
     @Override
     public void setUpUI() {
+        Toolbar toolbar = findViewById(R.id.tabanim_toolbar);
+        toolbar.setTitle(getResources().getString(R.string.app_name));
+        setSupportActionBar(toolbar);
         title=findViewById(R.id.title);
         description=findViewById(R.id.description);
         rootView = findViewById(R.id.root_view);
@@ -79,7 +83,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
 
     @Override
     public void getParticularVideo(Video video) {
-        Log.d("ravi", video.getId());
         selectedVideoID = video.getId();
 
         title.setText(video.getTitle());

@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         presenter = new MainPresenter(this, VideoRepository.getInstance(VideoRemoteDataSource.getInstance(),new MydatabaseAdapter(this)));
         presenter.start();
         presenter.getListOfVideos(new AppNetworkStatus(this));
-    }
+}
 
 
     @Override
@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     public void onItemClick(String position) {
-
         presenter.navigateToDetailsPage(position);
     }
 

@@ -5,4 +5,5 @@
     <color name="colorAccent">#ffffff</color>
     <color name="background">#ececec</color>
     <color name="text_msg_color">#535353</color>
+    <color name="black">#000000</color>
 </resources>
