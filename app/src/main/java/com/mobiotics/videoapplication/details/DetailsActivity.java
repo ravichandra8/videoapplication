@@ -71,9 +71,6 @@ public class DetailsActivity extends AppCompatActivity implements DetailsContrac
 
     @Override
     public void setUpUI() {
-        Toolbar toolbar = findViewById(R.id.tabanim_toolbar);
-        toolbar.setTitle(getResources().getString(R.string.app_name));
-        setSupportActionBar(toolbar);
         title=findViewById(R.id.title);
         description=findViewById(R.id.description);
         rootView = findViewById(R.id.root_view);
